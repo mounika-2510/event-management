@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
@@ -13,9 +13,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchRegistrations();
-  }, []);
+  }, [fetchRegistrations]);
 
-  const fetchRegistrations = async () => {
+  const fetchRegistrations = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/registrations/my-events`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -27,7 +27,7 @@ const Dashboard = () => {
       console.error("Error fetching registrations:", error);
       setLoading(false);
     }
-  };
+  }, [token]);
 
   const handleCancel = async (eventId) => {
     setCancelling(eventId);
