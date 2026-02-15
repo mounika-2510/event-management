@@ -19,6 +19,7 @@ const Events = () => {
     "Entertainment",
     "Health",
   ];
+
   const locations = [
     "Bangalore",
     "Mumbai",
@@ -36,6 +37,7 @@ const Events = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
+
       let url = `${API_URL}/events?`;
 
       if (searchTerm) url += `search=${searchTerm}&`;
@@ -45,10 +47,12 @@ const Events = () => {
       console.log("Fetching events with URL:", url);
 
       const response = await axios.get(url);
-      setEvents(response.data);
-      setLoading(false);
+
+      // Safe fallback if backend returns undefined
+      setEvents(response.data || []);
     } catch (error) {
       console.error("Error fetching events:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -143,3 +147,4 @@ const Events = () => {
 };
 
 export default Events;
+
