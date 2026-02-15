@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
@@ -14,14 +14,7 @@ const EventDetails = () => {
   const [message, setMessage] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
 
-  useEffect(() => {
-    fetchEvent();
-    if (user) {
-      checkRegistration();
-    }
-  }, [id, user]);
-
-  const fetchEvent = async () => {
+  const fetchEvent = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/events/${id}`);
       setEvent(response.data);
@@ -30,19 +23,28 @@ const EventDetails = () => {
       console.error("Error fetching event:", error);
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const checkRegistration = async () => {
+  const checkRegistration = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/registrations/my-events`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const registered = response.data.some((reg) => reg.eventId._id === id);
+      const registered = response.data.some(
+        (reg) => reg.eventId && reg.eventId._id === id,
+      );
       setIsRegistered(registered);
     } catch (error) {
       console.error("Error checking registration:", error);
     }
-  };
+  }, [id, token]);
+
+  useEffect(() => {
+    fetchEvent();
+    if (user) {
+      checkRegistration();
+    }
+  }, [fetchEvent, checkRegistration, user]);
 
   const handleRegister = async () => {
     if (!user) {
@@ -54,7 +56,7 @@ const EventDetails = () => {
     setMessage("");
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/registrations/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
@@ -162,7 +164,9 @@ const EventDetails = () => {
 
           {message && (
             <div
-              className={`message ${message.includes("success") ? "success-message" : "error-msg"}`}
+              className={`message ${
+                message.includes("success") ? "success-message" : "error-msg"
+              }`}
             >
               {message}
             </div>
