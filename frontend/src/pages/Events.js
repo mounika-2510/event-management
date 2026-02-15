@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import EventCard from "../components/EventCard";
 import { API_URL } from "../config";
@@ -30,11 +30,7 @@ const Events = () => {
     "Goa",
   ];
 
-  useEffect(() => {
-    fetchEvents();
-  }, [searchTerm, category, location]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -44,30 +40,18 @@ const Events = () => {
       if (category) url += `category=${category}&`;
       if (location) url += `location=${location}&`;
 
-      console.log("Fetching events with URL:", url);
-
       const response = await axios.get(url);
-
-      // Safe fallback if backend returns undefined
       setEvents(response.data || []);
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, category, location]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-  };
-
-  const handleLocationChange = (e) => {
-    setLocation(e.target.value);
-  };
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -85,13 +69,13 @@ const Events = () => {
             type="text"
             placeholder="Search events..."
             value={searchTerm}
-            onChange={handleSearch}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
 
           <select
             value={category}
-            onChange={handleCategoryChange}
+            onChange={(e) => setCategory(e.target.value)}
             className="filter-select"
           >
             <option value="">All Categories</option>
@@ -104,7 +88,7 @@ const Events = () => {
 
           <select
             value={location}
-            onChange={handleLocationChange}
+            onChange={(e) => setLocation(e.target.value)}
             className="filter-select"
           >
             <option value="">All Locations</option>
@@ -147,4 +131,5 @@ const Events = () => {
 };
 
 export default Events;
+
 
