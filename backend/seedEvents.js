@@ -76,7 +76,7 @@ const events = [
     name: "Digital Marketing Workshop",
     organizer: "Marketing Pro",
     location: "Bangalore",
-    date: new Date("2024-03-22"),
+    date: new Date("2026-03-22"),
     description: "Learn latest digital marketing strategies and tools",
     capacity: 60,
     availableSeats: 60,
@@ -94,7 +94,7 @@ const events = [
     category: "Music",
   },
   {
-    name: "Blockchain Conference 2024",
+    name: "Blockchain Conference 2026",
     organizer: "Crypto Community",
     location: "Mumbai",
     date: new Date("2026-04-20"),
