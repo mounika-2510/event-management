@@ -7,6 +7,9 @@ dotenv.config();
 
 const app = express();
 
+connectDB();
+
+
 app.use(cors({
     origin: '*',
     credentials: true
@@ -14,6 +17,7 @@ app.use(cors({
 
 app.use(express.json());
 
+// Test Routes
 app.get('/', (req, res) => {
     res.json({ message: 'Event Management API is running' });
 });
@@ -22,19 +26,14 @@ app.get('/api', (req, res) => {
     res.json({ message: 'API endpoint working' });
 });
 
+// Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/registrations', require('./routes/registrationRoutes'));
 
-const startServer = async () => {
-    try {
-        await connectDB();
-        console.log('Database connected');
-    } catch (error) {
-        console.error('Database connection failed:', error);
-    }
-};
+const PORT = process.env.PORT || 5000;
 
-startServer();
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
-module.exports = app;
